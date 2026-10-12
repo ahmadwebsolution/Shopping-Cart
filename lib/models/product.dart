@@ -5,6 +5,8 @@ class Product {
   final String description;
   final String category;
   final String image;
+  final double? ratingRate;
+  final int? ratingCount;
 
   Product({
     required this.id,
@@ -13,9 +15,12 @@ class Product {
     required this.description,
     required this.category,
     required this.image,
+    this.ratingRate,
+    this.ratingCount,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    final rating = json['rating'] as Map<String, dynamic>?;
     return Product(
       id: json['id'] ?? 0,
       title: json['title'] ?? '',
@@ -23,6 +28,8 @@ class Product {
       description: json['description'] ?? '',
       category: json['category'] ?? '',
       image: json['image'] ?? '',
+      ratingRate: (rating?['rate'] as num?)?.toDouble(),
+      ratingCount: (rating?['count'] as num?)?.toInt(),
     );
   }
 
@@ -34,6 +41,11 @@ class Product {
       'description': description,
       'category': category,
       'image': image,
+      if (ratingRate != null || ratingCount != null)
+        'rating': {
+          'rate': ratingRate,
+          'count': ratingCount,
+        },
     };
   }
 }

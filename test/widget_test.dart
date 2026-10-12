@@ -1,30 +1,56 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:shoppping/main.dart';
+import 'package:provider/provider.dart';
+import 'package:shoppping/models/product.dart';
+import 'package:shoppping/providers/cart_provider.dart';
+import 'package:shoppping/providers/wishlist_provider.dart';
+import 'package:shoppping/screens/product_detail_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('ProductDetailScreen displays product details and adds to cart',
+      (WidgetTester tester) async {
+    final testProduct = Product(
+      id: 1,
+      title: 'Test Jacket',
+      price: 99.99,
+      description: 'A warm and stylish jacket.',
+      category: 'clothing',
+      image: 'https://example.com/jacket.png',
+      ratingRate: 4.5,
+      ratingCount: 20,
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final cartProvider = CartProvider();
+    final wishlistProvider = WishlistProvider();
 
-    // Tap the '+' icon and trigger a frame.
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: cartProvider),
+          ChangeNotifierProvider.value(value: wishlistProvider),
+        ],
+        child: MaterialApp(
+          home: ProductDetailScreen(product: testProduct),
+        ),
+      ),
+    );
+
+    // Verify product information is displayed
+    expect(find.text('Test Jacket'), findsOneWidget);
+    expect(find.text('\$99.99'), findsOneWidget);
+    expect(find.text('A warm and stylish jacket.'), findsOneWidget);
+    expect(find.text('CLOTHING'), findsOneWidget);
+    expect(find.text('4.5'), findsOneWidget);
+
+    // Test quantity stepper
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
+    expect(find.text('2'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Test Add to Cart action
+    await tester.tap(find.byIcon(Icons.shopping_cart_outlined));
+    await tester.pump();
+
+    expect(cartProvider.itemCount, equals(2));
   });
 }

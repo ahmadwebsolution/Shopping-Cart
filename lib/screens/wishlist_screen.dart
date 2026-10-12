@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../providers/cart_provider.dart';
+import 'product_detail_screen.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -23,11 +24,24 @@ class WishlistScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final product = wishlist.wishlistProducts[index];
               return ListTile(
-                leading: Image.network(
-                  product.image,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductDetailScreen(product: product),
+                    ),
+                  );
+                },
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.network(
+                    product.image,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image, size: 40),
+                  ),
                 ),
                 title: Text(product.title, maxLines: 1),
                 subtitle: Text('\$${product.price.toStringAsFixed(2)}'),

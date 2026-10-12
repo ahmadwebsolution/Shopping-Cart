@@ -50,11 +50,11 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  void addToCart(Product product) {
+  void addToCart(Product product, {int quantity = 1}) {
     if (_items.containsKey(product.id)) {
-      _items[product.id]!.quantity += 1;
+      _items[product.id]!.quantity += quantity;
     } else {
-      _items[product.id] = CartItem(product: product);
+      _items[product.id] = CartItem(product: product, quantity: quantity);
     }
     notifyListeners();
   }
